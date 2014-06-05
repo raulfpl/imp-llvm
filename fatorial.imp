@@ -1,0 +1,14 @@
+var {
+  int x;
+  int fatorial;
+}
+program {
+	print "digite um numero:";
+	read x;
+	fatorial := 1;
+	while ! (x <= 1) do {
+		fatorial := fatorial * x;
+    	x := x - 1;
+	}
+	print fatorial;
+}
