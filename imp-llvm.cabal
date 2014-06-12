@@ -57,7 +57,7 @@ executable imp-llvm
   -- other-extensions:    
   
   -- Other library packages from which modules are imported.
-  build-depends:       base , pretty , parsec
+  build-depends:       base , pretty , parsec, mtl
   
   -- Directories containing source files.
   -- hs-source-dirs:      
