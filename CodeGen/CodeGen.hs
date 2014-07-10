@@ -50,6 +50,25 @@ instance CodeGen BExp where
                      let f True  = 1
                          f False = 0
                      return (text $ concat ["%",show v," = add i32", " 0, ", show (f b)], v)
+  gen (e :=: e') = do
+     (c,v) <- gen e
+     (c',v') <- gen e'
+     [r1, r2] <- mapM fresh [1..2]
+     return (text $ concat ["%", show r1, " = icmp eq i32 %", show 2, ", %", show v', "\n",
+                            "%", show r2, " = zext i1 %", show r1, " to i32\n"], r2)
+  gen (e :<=: e') = do
+     (c,v) <- gen e
+     (c',v') <- gen e'
+     [r1, r2] <- mapM fresh [1..2]
+     return (text $ concat ["%", show r1, " = icmp sle i32 %", show 2, ", %", show v', "\n",
+                            "%", show r2, " = zext i1 %", show r1, " to i32\n"], r2)
+  gen (Not e) = do
+     (c,v) <- gen e
+     [r1, r2, r3] <- mapM fresh [1..3]
+     return (text $ concat ["%", show r1, " = icmp ne i32 %", show v, ", 0\n",
+                            "%", show r2, " = xor i1 %", show r1, ", true\n",
+                            "%", show r3, " = zext i1 %", show r2, " to i32\n"], r3)
+
   gen (e :|: e') = do
      (c,v) <- gen e
      (c',v') <- gen e'
@@ -82,6 +101,8 @@ instance CodeGen BExp where
                            "; <label>:", show l3, "\n",
                            "%", show r3, " = phi il [ true,%", show l1, " ], [ %", show r2, ", %", show l2, "]\n",
                            "%", show r4, " = zext i1 %", show r3, " to i32\n"] ,r4)
+
+  gen (BNum e) = gen e
 
 genBinExp :: AExp -> AExp -> String -> GenM (Result AExp)
 genBinExp e e' op = do
